@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractClinicServiceTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$UserServiceImplTest.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.service.clinicService</a> &gt; <span class="el_source">AbstractClinicServiceTests.java</span></div><h1>AbstractClinicServiceTests.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2002-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.samples.petclinic.service.clinicService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collection;
+import java.util.Date;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Specialty;
+import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.samples.petclinic.util.EntityUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * &lt;p&gt; Base class for {@link ClinicService} integration tests. &lt;/p&gt; &lt;p&gt; Subclasses should specify Spring context
+ * configuration using {@link ContextConfiguration @ContextConfiguration} annotation &lt;/p&gt; &lt;p&gt;
+ * AbstractclinicServiceTests and its subclasses benefit from the following services provided by the Spring
+ * TestContext Framework: &lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Spring IoC container caching&lt;/strong&gt; which spares us unnecessary set up
+ * time between test execution.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Dependency Injection&lt;/strong&gt; of test fixture instances, meaning that
+ * we don't need to perform application context lookups. See the use of {@link Autowired @Autowired} on the &lt;code&gt;{@link
+ * AbstractClinicServiceTests#clinicService clinicService}&lt;/code&gt; instance variable, which uses autowiring &lt;em&gt;by
+ * type&lt;/em&gt;. &lt;li&gt;&lt;strong&gt;Transaction management&lt;/strong&gt;, meaning each test method is executed in its own transaction,
+ * which is automatically rolled back by default. Thus, even if tests insert or otherwise change database state, there
+ * is no need for a teardown or cleanup script. &lt;li&gt; An {@link org.springframework.context.ApplicationContext
+ * ApplicationContext} is also inherited and can be used for explicit bean lookup if necessary. &lt;/li&gt; &lt;/ul&gt;
+ *
+ * @author Ken Krebs
+ * @author Rod Johnson
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ * @author Vitaliy Fedoriv
+ */
+<span class="nc" id="L56">public abstract class AbstractClinicServiceTests {</span>
+
+    @Autowired
+    protected ClinicService clinicService;
+
+    @Test
+    public void shouldFindOwnersByLastName() {
+<span class="nc" id="L63">        Collection&lt;Owner&gt; owners = this.clinicService.findOwnerByLastName(&quot;Davis&quot;);</span>
+<span class="nc" id="L64">        assertThat(owners.size()).isEqualTo(2);</span>
+
+<span class="nc" id="L66">        owners = this.clinicService.findOwnerByLastName(&quot;Daviss&quot;);</span>
+<span class="nc" id="L67">        assertThat(owners.isEmpty()).isTrue();</span>
+<span class="nc" id="L68">    }</span>
+
+    @Test
+    public void shouldFindSingleOwnerWithPet() {
+<span class="nc" id="L72">        Owner owner = this.clinicService.findOwnerById(1);</span>
+<span class="nc" id="L73">        assertThat(owner.getLastName()).startsWith(&quot;Franklin&quot;);</span>
+<span class="nc" id="L74">        assertThat(owner.getPets().size()).isEqualTo(1);</span>
+<span class="nc" id="L75">        assertThat(owner.getPets().get(0).getType()).isNotNull();</span>
+<span class="nc" id="L76">        assertThat(owner.getPets().get(0).getType().getName()).isEqualTo(&quot;cat&quot;);</span>
+<span class="nc" id="L77">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldInsertOwner() {
+<span class="nc" id="L82">        Collection&lt;Owner&gt; owners = this.clinicService.findOwnerByLastName(&quot;Schultz&quot;);</span>
+<span class="nc" id="L83">        int found = owners.size();</span>
+
+<span class="nc" id="L85">        Owner owner = new Owner();</span>
+<span class="nc" id="L86">        owner.setFirstName(&quot;Sam&quot;);</span>
+<span class="nc" id="L87">        owner.setLastName(&quot;Schultz&quot;);</span>
+<span class="nc" id="L88">        owner.setAddress(&quot;4, Evans Street&quot;);</span>
+<span class="nc" id="L89">        owner.setCity(&quot;Wollongong&quot;);</span>
+<span class="nc" id="L90">        owner.setTelephone(&quot;4444444444&quot;);</span>
+<span class="nc" id="L91">        this.clinicService.saveOwner(owner);</span>
+<span class="nc" id="L92">        assertThat(owner.getId().longValue()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L94">        owners = this.clinicService.findOwnerByLastName(&quot;Schultz&quot;);</span>
+<span class="nc" id="L95">        assertThat(owners.size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L96">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdateOwner() {
+<span class="nc" id="L101">        Owner owner = this.clinicService.findOwnerById(1);</span>
+<span class="nc" id="L102">        String oldLastName = owner.getLastName();</span>
+<span class="nc" id="L103">        String newLastName = oldLastName + &quot;X&quot;;</span>
+
+<span class="nc" id="L105">        owner.setLastName(newLastName);</span>
+<span class="nc" id="L106">        this.clinicService.saveOwner(owner);</span>
+
+        // retrieving new name from database
+<span class="nc" id="L109">        owner = this.clinicService.findOwnerById(1);</span>
+<span class="nc" id="L110">        assertThat(owner.getLastName()).isEqualTo(newLastName);</span>
+<span class="nc" id="L111">    }</span>
+
+    @Test
+    public void shouldFindPetWithCorrectId() {
+<span class="nc" id="L115">        Pet pet7 = this.clinicService.findPetById(7);</span>
+<span class="nc" id="L116">        assertThat(pet7.getName()).startsWith(&quot;Samantha&quot;);</span>
+<span class="nc" id="L117">        assertThat(pet7.getOwner().getFirstName()).isEqualTo(&quot;Jean&quot;);</span>
+
+<span class="nc" id="L119">    }</span>
+
+//    @Test
+//    public void shouldFindAllPetTypes() {
+//        Collection&lt;PetType&gt; petTypes = this.clinicService.findPetTypes();
+//
+//        PetType petType1 = EntityUtils.getById(petTypes, PetType.class, 1);
+//        assertThat(petType1.getName()).isEqualTo(&quot;cat&quot;);
+//        PetType petType4 = EntityUtils.getById(petTypes, PetType.class, 4);
+//        assertThat(petType4.getName()).isEqualTo(&quot;snake&quot;);
+//    }
+
+    @Test
+    @Transactional
+    public void shouldInsertPetIntoDatabaseAndGenerateId() {
+<span class="nc" id="L134">        Owner owner6 = this.clinicService.findOwnerById(6);</span>
+<span class="nc" id="L135">        int found = owner6.getPets().size();</span>
+
+<span class="nc" id="L137">        Pet pet = new Pet();</span>
+<span class="nc" id="L138">        pet.setName(&quot;bowser&quot;);</span>
+<span class="nc" id="L139">        Collection&lt;PetType&gt; types = this.clinicService.findPetTypes();</span>
+<span class="nc" id="L140">        pet.setType(EntityUtils.getById(types, PetType.class, 2));</span>
+<span class="nc" id="L141">        pet.setBirthDate(new Date());</span>
+<span class="nc" id="L142">        owner6.addPet(pet);</span>
+<span class="nc" id="L143">        assertThat(owner6.getPets().size()).isEqualTo(found + 1);</span>
+
+<span class="nc" id="L145">        this.clinicService.savePet(pet);</span>
+<span class="nc" id="L146">        this.clinicService.saveOwner(owner6);</span>
+
+<span class="nc" id="L148">        owner6 = this.clinicService.findOwnerById(6);</span>
+<span class="nc" id="L149">        assertThat(owner6.getPets().size()).isEqualTo(found + 1);</span>
+        // checks that id has been generated
+<span class="nc" id="L151">        assertThat(pet.getId()).isNotNull();</span>
+<span class="nc" id="L152">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdatePetName() throws Exception {
+<span class="nc" id="L157">        Pet pet7 = this.clinicService.findPetById(7);</span>
+<span class="nc" id="L158">        String oldName = pet7.getName();</span>
+
+<span class="nc" id="L160">        String newName = oldName + &quot;X&quot;;</span>
+<span class="nc" id="L161">        pet7.setName(newName);</span>
+<span class="nc" id="L162">        this.clinicService.savePet(pet7);</span>
+
+<span class="nc" id="L164">        pet7 = this.clinicService.findPetById(7);</span>
+<span class="nc" id="L165">        assertThat(pet7.getName()).isEqualTo(newName);</span>
+<span class="nc" id="L166">    }</span>
+
+    @Test
+    public void shouldFindVets() {
+<span class="nc" id="L170">        Collection&lt;Vet&gt; vets = this.clinicService.findVets();</span>
+
+<span class="nc" id="L172">        Vet vet = EntityUtils.getById(vets, Vet.class, 3);</span>
+<span class="nc" id="L173">        assertThat(vet.getLastName()).isEqualTo(&quot;Douglas&quot;);</span>
+<span class="nc" id="L174">        assertThat(vet.getNrOfSpecialties()).isEqualTo(2);</span>
+<span class="nc" id="L175">        assertThat(vet.getSpecialties().get(0).getName()).isEqualTo(&quot;dentistry&quot;);</span>
+<span class="nc" id="L176">        assertThat(vet.getSpecialties().get(1).getName()).isEqualTo(&quot;surgery&quot;);</span>
+<span class="nc" id="L177">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldAddNewVisitForPet() {
+<span class="nc" id="L182">        Pet pet7 = this.clinicService.findPetById(7);</span>
+<span class="nc" id="L183">        int found = pet7.getVisits().size();</span>
+<span class="nc" id="L184">        Visit visit = new Visit();</span>
+<span class="nc" id="L185">        pet7.addVisit(visit);</span>
+<span class="nc" id="L186">        visit.setDescription(&quot;test&quot;);</span>
+<span class="nc" id="L187">        this.clinicService.saveVisit(visit);</span>
+<span class="nc" id="L188">        this.clinicService.savePet(pet7);</span>
+
+<span class="nc" id="L190">        pet7 = this.clinicService.findPetById(7);</span>
+<span class="nc" id="L191">        assertThat(pet7.getVisits().size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L192">        assertThat(visit.getId()).isNotNull();</span>
+<span class="nc" id="L193">    }</span>
+
+    @Test
+       public void shouldFindVisitsByPetId() throws Exception {
+<span class="nc" id="L197">        Collection&lt;Visit&gt; visits = this.clinicService.findVisitsByPetId(7);</span>
+<span class="nc" id="L198">        assertThat(visits.size()).isEqualTo(2);</span>
+<span class="nc" id="L199">        Visit[] visitArr = visits.toArray(new Visit[visits.size()]);</span>
+<span class="nc" id="L200">        assertThat(visitArr[0].getPet()).isNotNull();</span>
+<span class="nc" id="L201">        assertThat(visitArr[0].getDate()).isNotNull();</span>
+<span class="nc" id="L202">        assertThat(visitArr[0].getPet().getId()).isEqualTo(7);</span>
+<span class="nc" id="L203">    }</span>
+
+    @Test
+    public void shouldFindAllPets(){
+<span class="nc" id="L207">        Collection&lt;Pet&gt; pets = this.clinicService.findAllPets();</span>
+<span class="nc" id="L208">        Pet pet1 = EntityUtils.getById(pets, Pet.class, 1);</span>
+<span class="nc" id="L209">        assertThat(pet1.getName()).isEqualTo(&quot;Leo&quot;);</span>
+<span class="nc" id="L210">        Pet pet3 = EntityUtils.getById(pets, Pet.class, 3);</span>
+<span class="nc" id="L211">        assertThat(pet3.getName()).isEqualTo(&quot;Rosy&quot;);</span>
+<span class="nc" id="L212">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeletePet(){
+<span class="nc" id="L217">        Pet pet = this.clinicService.findPetById(1);</span>
+<span class="nc" id="L218">        this.clinicService.deletePet(pet);</span>
+        try {
+<span class="nc" id="L220">            pet = this.clinicService.findPetById(1);</span>
+<span class="nc" id="L221">		} catch (Exception e) {</span>
+<span class="nc" id="L222">			pet = null;</span>
+<span class="nc" id="L223">		}</span>
+<span class="nc" id="L224">        assertThat(pet).isNull();</span>
+<span class="nc" id="L225">    }</span>
+
+    @Test
+    public void shouldFindVisitDyId(){
+<span class="nc" id="L229">    	Visit visit = this.clinicService.findVisitById(1);</span>
+<span class="nc" id="L230">    	assertThat(visit.getId()).isEqualTo(1);</span>
+<span class="nc" id="L231">    	assertThat(visit.getPet().getName()).isEqualTo(&quot;Samantha&quot;);</span>
+<span class="nc" id="L232">    }</span>
+
+    @Test
+    public void shouldFindAllVisits(){
+<span class="nc" id="L236">        Collection&lt;Visit&gt; visits = this.clinicService.findAllVisits();</span>
+<span class="nc" id="L237">        Visit visit1 = EntityUtils.getById(visits, Visit.class, 1);</span>
+<span class="nc" id="L238">        assertThat(visit1.getPet().getName()).isEqualTo(&quot;Samantha&quot;);</span>
+<span class="nc" id="L239">        Visit visit3 = EntityUtils.getById(visits, Visit.class, 3);</span>
+<span class="nc" id="L240">        assertThat(visit3.getPet().getName()).isEqualTo(&quot;Max&quot;);</span>
+<span class="nc" id="L241">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldInsertVisit() {
+<span class="nc" id="L246">        Collection&lt;Visit&gt; visits = this.clinicService.findAllVisits();</span>
+<span class="nc" id="L247">        int found = visits.size();</span>
+
+<span class="nc" id="L249">        Pet pet = this.clinicService.findPetById(1);</span>
+
+<span class="nc" id="L251">        Visit visit = new Visit();</span>
+<span class="nc" id="L252">        visit.setPet(pet);</span>
+<span class="nc" id="L253">        visit.setDate(new Date());</span>
+<span class="nc" id="L254">        visit.setDescription(&quot;new visit&quot;);</span>
+
+
+<span class="nc" id="L257">        this.clinicService.saveVisit(visit);</span>
+<span class="nc" id="L258">        assertThat(visit.getId().longValue()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L260">        visits = this.clinicService.findAllVisits();</span>
+<span class="nc" id="L261">        assertThat(visits.size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L262">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdateVisit(){
+<span class="nc" id="L267">    	Visit visit = this.clinicService.findVisitById(1);</span>
+<span class="nc" id="L268">    	String oldDesc = visit.getDescription();</span>
+<span class="nc" id="L269">        String newDesc = oldDesc + &quot;X&quot;;</span>
+<span class="nc" id="L270">        visit.setDescription(newDesc);</span>
+<span class="nc" id="L271">        this.clinicService.saveVisit(visit);</span>
+<span class="nc" id="L272">        visit = this.clinicService.findVisitById(1);</span>
+<span class="nc" id="L273">        assertThat(visit.getDescription()).isEqualTo(newDesc);</span>
+<span class="nc" id="L274">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeleteVisit(){
+<span class="nc" id="L279">    	Visit visit = this.clinicService.findVisitById(1);</span>
+<span class="nc" id="L280">        this.clinicService.deleteVisit(visit);</span>
+        try {
+<span class="nc" id="L282">        	visit = this.clinicService.findVisitById(1);</span>
+<span class="nc" id="L283">		} catch (Exception e) {</span>
+<span class="nc" id="L284">			visit = null;</span>
+<span class="nc" id="L285">		}</span>
+<span class="nc" id="L286">        assertThat(visit).isNull();</span>
+<span class="nc" id="L287">    }</span>
+
+    @Test
+    public void shouldFindVetDyId(){
+<span class="nc" id="L291">    	Vet vet = this.clinicService.findVetById(1);</span>
+<span class="nc" id="L292">    	assertThat(vet.getFirstName()).isEqualTo(&quot;James&quot;);</span>
+<span class="nc" id="L293">    	assertThat(vet.getLastName()).isEqualTo(&quot;Carter&quot;);</span>
+<span class="nc" id="L294">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldInsertVet() {
+<span class="nc" id="L299">        Collection&lt;Vet&gt; vets = this.clinicService.findAllVets();</span>
+<span class="nc" id="L300">        int found = vets.size();</span>
+
+<span class="nc" id="L302">        Vet vet = new Vet();</span>
+<span class="nc" id="L303">        vet.setFirstName(&quot;John&quot;);</span>
+<span class="nc" id="L304">        vet.setLastName(&quot;Dow&quot;);</span>
+
+<span class="nc" id="L306">        this.clinicService.saveVet(vet);</span>
+<span class="nc" id="L307">        assertThat(vet.getId().longValue()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L309">        vets = this.clinicService.findAllVets();</span>
+<span class="nc" id="L310">        assertThat(vets.size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L311">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdateVet(){
+<span class="nc" id="L316">    	Vet vet = this.clinicService.findVetById(1);</span>
+<span class="nc" id="L317">    	String oldLastName = vet.getLastName();</span>
+<span class="nc" id="L318">        String newLastName = oldLastName + &quot;X&quot;;</span>
+<span class="nc" id="L319">        vet.setLastName(newLastName);</span>
+<span class="nc" id="L320">        this.clinicService.saveVet(vet);</span>
+<span class="nc" id="L321">        vet = this.clinicService.findVetById(1);</span>
+<span class="nc" id="L322">        assertThat(vet.getLastName()).isEqualTo(newLastName);</span>
+<span class="nc" id="L323">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeleteVet(){
+<span class="nc" id="L328">    	Vet vet = this.clinicService.findVetById(1);</span>
+<span class="nc" id="L329">        this.clinicService.deleteVet(vet);</span>
+        try {
+<span class="nc" id="L331">        	vet = this.clinicService.findVetById(1);</span>
+<span class="nc" id="L332">		} catch (Exception e) {</span>
+<span class="nc" id="L333">			vet = null;</span>
+<span class="nc" id="L334">		}</span>
+<span class="nc" id="L335">        assertThat(vet).isNull();</span>
+<span class="nc" id="L336">    }</span>
+
+    @Test
+    public void shouldFindAllOwners(){
+<span class="nc" id="L340">        Collection&lt;Owner&gt; owners = this.clinicService.findAllOwners();</span>
+<span class="nc" id="L341">        Owner owner1 = EntityUtils.getById(owners, Owner.class, 1);</span>
+<span class="nc" id="L342">        assertThat(owner1.getFirstName()).isEqualTo(&quot;George&quot;);</span>
+<span class="nc" id="L343">        Owner owner3 = EntityUtils.getById(owners, Owner.class, 3);</span>
+<span class="nc" id="L344">        assertThat(owner3.getFirstName()).isEqualTo(&quot;Eduardo&quot;);</span>
+<span class="nc" id="L345">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeleteOwner(){
+<span class="nc" id="L350">    	Owner owner = this.clinicService.findOwnerById(1);</span>
+<span class="nc" id="L351">        this.clinicService.deleteOwner(owner);</span>
+        try {
+<span class="nc" id="L353">        	owner = this.clinicService.findOwnerById(1);</span>
+<span class="nc" id="L354">		} catch (Exception e) {</span>
+<span class="nc" id="L355">			owner = null;</span>
+<span class="nc" id="L356">		}</span>
+<span class="nc" id="L357">        assertThat(owner).isNull();</span>
+<span class="nc" id="L358">    }</span>
+
+    @Test
+    public void shouldFindPetTypeById(){
+<span class="nc" id="L362">    	PetType petType = this.clinicService.findPetTypeById(1);</span>
+<span class="nc" id="L363">    	assertThat(petType.getName()).isEqualTo(&quot;cat&quot;);</span>
+<span class="nc" id="L364">    }</span>
+
+    @Test
+    public void shouldFindAllPetTypes(){
+<span class="nc" id="L368">        Collection&lt;PetType&gt; petTypes = this.clinicService.findAllPetTypes();</span>
+<span class="nc" id="L369">        PetType petType1 = EntityUtils.getById(petTypes, PetType.class, 1);</span>
+<span class="nc" id="L370">        assertThat(petType1.getName()).isEqualTo(&quot;cat&quot;);</span>
+<span class="nc" id="L371">        PetType petType3 = EntityUtils.getById(petTypes, PetType.class, 3);</span>
+<span class="nc" id="L372">        assertThat(petType3.getName()).isEqualTo(&quot;lizard&quot;);</span>
+<span class="nc" id="L373">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldInsertPetType() {
+<span class="nc" id="L378">        Collection&lt;PetType&gt; petTypes = this.clinicService.findAllPetTypes();</span>
+<span class="nc" id="L379">        int found = petTypes.size();</span>
+
+<span class="nc" id="L381">        PetType petType = new PetType();</span>
+<span class="nc" id="L382">        petType.setName(&quot;tiger&quot;);</span>
+
+<span class="nc" id="L384">        this.clinicService.savePetType(petType);</span>
+<span class="nc" id="L385">        assertThat(petType.getId().longValue()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L387">        petTypes = this.clinicService.findAllPetTypes();</span>
+<span class="nc" id="L388">        assertThat(petTypes.size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L389">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdatePetType(){
+<span class="nc" id="L394">    	PetType petType = this.clinicService.findPetTypeById(1);</span>
+<span class="nc" id="L395">    	String oldLastName = petType.getName();</span>
+<span class="nc" id="L396">        String newLastName = oldLastName + &quot;X&quot;;</span>
+<span class="nc" id="L397">        petType.setName(newLastName);</span>
+<span class="nc" id="L398">        this.clinicService.savePetType(petType);</span>
+<span class="nc" id="L399">        petType = this.clinicService.findPetTypeById(1);</span>
+<span class="nc" id="L400">        assertThat(petType.getName()).isEqualTo(newLastName);</span>
+<span class="nc" id="L401">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeletePetType(){
+<span class="nc" id="L406">    	PetType petType = this.clinicService.findPetTypeById(1);</span>
+<span class="nc" id="L407">        this.clinicService.deletePetType(petType);</span>
+        try {
+<span class="nc" id="L409">        	petType = this.clinicService.findPetTypeById(1);</span>
+<span class="nc" id="L410">		} catch (Exception e) {</span>
+<span class="nc" id="L411">			petType = null;</span>
+<span class="nc" id="L412">		}</span>
+<span class="nc" id="L413">        assertThat(petType).isNull();</span>
+<span class="nc" id="L414">    }</span>
+
+    @Test
+    public void shouldFindSpecialtyById(){
+<span class="nc" id="L418">    	Specialty specialty = this.clinicService.findSpecialtyById(1);</span>
+<span class="nc" id="L419">    	assertThat(specialty.getName()).isEqualTo(&quot;radiology&quot;);</span>
+<span class="nc" id="L420">    }</span>
+
+    @Test
+    public void shouldFindAllSpecialtys(){
+<span class="nc" id="L424">        Collection&lt;Specialty&gt; specialties = this.clinicService.findAllSpecialties();</span>
+<span class="nc" id="L425">        Specialty specialty1 = EntityUtils.getById(specialties, Specialty.class, 1);</span>
+<span class="nc" id="L426">        assertThat(specialty1.getName()).isEqualTo(&quot;radiology&quot;);</span>
+<span class="nc" id="L427">        Specialty specialty3 = EntityUtils.getById(specialties, Specialty.class, 3);</span>
+<span class="nc" id="L428">        assertThat(specialty3.getName()).isEqualTo(&quot;dentistry&quot;);</span>
+<span class="nc" id="L429">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldInsertSpecialty() {
+<span class="nc" id="L434">        Collection&lt;Specialty&gt; specialties = this.clinicService.findAllSpecialties();</span>
+<span class="nc" id="L435">        int found = specialties.size();</span>
+
+<span class="nc" id="L437">        Specialty specialty = new Specialty();</span>
+<span class="nc" id="L438">        specialty.setName(&quot;dermatologist&quot;);</span>
+
+<span class="nc" id="L440">        this.clinicService.saveSpecialty(specialty);</span>
+<span class="nc" id="L441">        assertThat(specialty.getId().longValue()).isNotEqualTo(0);</span>
+
+<span class="nc" id="L443">        specialties = this.clinicService.findAllSpecialties();</span>
+<span class="nc" id="L444">        assertThat(specialties.size()).isEqualTo(found + 1);</span>
+<span class="nc" id="L445">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldUpdateSpecialty(){
+<span class="nc" id="L450">    	Specialty specialty = this.clinicService.findSpecialtyById(1);</span>
+<span class="nc" id="L451">    	String oldLastName = specialty.getName();</span>
+<span class="nc" id="L452">        String newLastName = oldLastName + &quot;X&quot;;</span>
+<span class="nc" id="L453">        specialty.setName(newLastName);</span>
+<span class="nc" id="L454">        this.clinicService.saveSpecialty(specialty);</span>
+<span class="nc" id="L455">        specialty = this.clinicService.findSpecialtyById(1);</span>
+<span class="nc" id="L456">        assertThat(specialty.getName()).isEqualTo(newLastName);</span>
+<span class="nc" id="L457">    }</span>
+
+    @Test
+    @Transactional
+    public void shouldDeleteSpecialty(){
+<span class="nc" id="L462">        Specialty specialty = new Specialty();</span>
+<span class="nc" id="L463">        specialty.setName(&quot;test&quot;);</span>
+<span class="nc" id="L464">        this.clinicService.saveSpecialty(specialty);</span>
+<span class="nc" id="L465">        Integer specialtyId = specialty.getId();</span>
+<span class="nc" id="L466">        assertThat(specialtyId).isNotNull();</span>
+<span class="nc" id="L467">    	specialty = this.clinicService.findSpecialtyById(specialtyId);</span>
+<span class="nc" id="L468">        assertThat(specialty).isNotNull();</span>
+<span class="nc" id="L469">        this.clinicService.deleteSpecialty(specialty);</span>
+        try {
+<span class="nc" id="L471">        	specialty = this.clinicService.findSpecialtyById(specialtyId);</span>
+<span class="nc" id="L472">		} catch (Exception e) {</span>
+<span class="nc" id="L473">			specialty = null;</span>
+<span class="nc" id="L474">		}</span>
+<span class="nc" id="L475">        assertThat(specialty).isNull();</span>
+<span class="nc" id="L476">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
