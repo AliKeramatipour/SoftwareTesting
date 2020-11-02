@@ -309,7 +309,7 @@ public class OwnerRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateVetErrorWithBindingError() throws Exception {
+	public void testUpdateOwnerErrorWithBindingError() throws Exception {
 		String newOwnerAsJSON = "{}";
 		this.mockMvc.perform(put("/api/owners/1")
 			.content(newOwnerAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))

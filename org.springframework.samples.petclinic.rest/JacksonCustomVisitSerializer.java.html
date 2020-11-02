@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JacksonCustomVisitSerializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$OwnerRestControllerTests.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">JacksonCustomVisitSerializer.java</span></div><h1>JacksonCustomVisitSerializer.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JacksonCustomVisitSerializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$VisitRestControllerTests.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">JacksonCustomVisitSerializer.java</span></div><h1>JacksonCustomVisitSerializer.java</h1><pre class="source lang-java linenums">/*
  * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -37,64 +37,64 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 public class JacksonCustomVisitSerializer extends StdSerializer&lt;Visit&gt; {
 
 	public JacksonCustomVisitSerializer() {
-<span class="nc" id="L40">		this(null);</span>
-<span class="nc" id="L41">	}</span>
+<span class="fc" id="L40">		this(null);</span>
+<span class="fc" id="L41">	}</span>
 
 	protected JacksonCustomVisitSerializer(Class&lt;Visit&gt; t) {
-<span class="nc" id="L44">		super(t);</span>
-<span class="nc" id="L45">	}</span>
+<span class="fc" id="L44">		super(t);</span>
+<span class="fc" id="L45">	}</span>
 
 	@Override
 	public void serialize(Visit visit, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-<span class="nc bnc" id="L49" title="All 4 branches missed.">		if ((visit == null) || (visit.getPet() == null)) {</span>
-<span class="nc" id="L50">			throw new IOException(&quot;Cannot serialize Visit object - visit or visit.pet is null&quot;);</span>
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">		if ((visit == null) || (visit.getPet() == null)) {</span>
+<span class="fc" id="L50">			throw new IOException(&quot;Cannot serialize Visit object - visit or visit.pet is null&quot;);</span>
 		}
-<span class="nc" id="L52">		Format formatter = new SimpleDateFormat(&quot;yyyy/MM/dd&quot;);</span>
-<span class="nc" id="L53">		jgen.writeStartObject(); // visit</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">		if (visit.getId() == null) {</span>
+<span class="fc" id="L52">		Format formatter = new SimpleDateFormat(&quot;yyyy/MM/dd&quot;);</span>
+<span class="fc" id="L53">		jgen.writeStartObject(); // visit</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">		if (visit.getId() == null) {</span>
 <span class="nc" id="L55">			jgen.writeNullField(&quot;id&quot;);</span>
 		} else {
-<span class="nc" id="L57">			jgen.writeNumberField(&quot;id&quot;, visit.getId());</span>
+<span class="fc" id="L57">			jgen.writeNumberField(&quot;id&quot;, visit.getId());</span>
 		}
-<span class="nc" id="L59">		jgen.writeStringField(&quot;date&quot;, formatter.format(visit.getDate()));</span>
-<span class="nc" id="L60">		jgen.writeStringField(&quot;description&quot;, visit.getDescription());</span>
+<span class="fc" id="L59">		jgen.writeStringField(&quot;date&quot;, formatter.format(visit.getDate()));</span>
+<span class="fc" id="L60">		jgen.writeStringField(&quot;description&quot;, visit.getDescription());</span>
 
-<span class="nc" id="L62">		Pet pet = visit.getPet();</span>
-<span class="nc" id="L63">		jgen.writeObjectFieldStart(&quot;pet&quot;);</span>
-<span class="nc bnc" id="L64" title="All 2 branches missed.">		if (pet.getId() == null) {</span>
+<span class="fc" id="L62">		Pet pet = visit.getPet();</span>
+<span class="fc" id="L63">		jgen.writeObjectFieldStart(&quot;pet&quot;);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">		if (pet.getId() == null) {</span>
 <span class="nc" id="L65">			jgen.writeNullField(&quot;id&quot;);</span>
 		} else {
-<span class="nc" id="L67">			jgen.writeNumberField(&quot;id&quot;, pet.getId());</span>
+<span class="fc" id="L67">			jgen.writeNumberField(&quot;id&quot;, pet.getId());</span>
 		}
-<span class="nc" id="L69">		jgen.writeStringField(&quot;name&quot;, pet.getName());</span>
-<span class="nc" id="L70">		jgen.writeStringField(&quot;birthDate&quot;, formatter.format(pet.getBirthDate()));</span>
+<span class="fc" id="L69">		jgen.writeStringField(&quot;name&quot;, pet.getName());</span>
+<span class="fc" id="L70">		jgen.writeStringField(&quot;birthDate&quot;, formatter.format(pet.getBirthDate()));</span>
 
-<span class="nc" id="L72">		PetType petType = pet.getType();</span>
-<span class="nc" id="L73">		jgen.writeObjectFieldStart(&quot;type&quot;);</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">		if (petType.getId() == null) {</span>
+<span class="fc" id="L72">		PetType petType = pet.getType();</span>
+<span class="fc" id="L73">		jgen.writeObjectFieldStart(&quot;type&quot;);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">		if (petType.getId() == null) {</span>
 <span class="nc" id="L75">			jgen.writeNullField(&quot;id&quot;);</span>
 		} else {
-<span class="nc" id="L77">			jgen.writeNumberField(&quot;id&quot;, petType.getId());</span>
+<span class="fc" id="L77">			jgen.writeNumberField(&quot;id&quot;, petType.getId());</span>
 		}
-<span class="nc" id="L79">		jgen.writeStringField(&quot;name&quot;, petType.getName());</span>
-<span class="nc" id="L80">		jgen.writeEndObject(); // type</span>
+<span class="fc" id="L79">		jgen.writeStringField(&quot;name&quot;, petType.getName());</span>
+<span class="fc" id="L80">		jgen.writeEndObject(); // type</span>
 
-<span class="nc" id="L82">		Owner owner = pet.getOwner();</span>
-<span class="nc" id="L83">		jgen.writeObjectFieldStart(&quot;owner&quot;);</span>
-<span class="nc bnc" id="L84" title="All 2 branches missed.">		if (owner.getId() == null) {</span>
+<span class="fc" id="L82">		Owner owner = pet.getOwner();</span>
+<span class="fc" id="L83">		jgen.writeObjectFieldStart(&quot;owner&quot;);</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">		if (owner.getId() == null) {</span>
 <span class="nc" id="L85">			jgen.writeNullField(&quot;id&quot;);</span>
 		} else {
-<span class="nc" id="L87">			jgen.writeNumberField(&quot;id&quot;, owner.getId());</span>
+<span class="fc" id="L87">			jgen.writeNumberField(&quot;id&quot;, owner.getId());</span>
 		}
-<span class="nc" id="L89">		jgen.writeStringField(&quot;firstName&quot;, owner.getFirstName());</span>
-<span class="nc" id="L90">		jgen.writeStringField(&quot;lastName&quot;, owner.getLastName());</span>
-<span class="nc" id="L91">		jgen.writeStringField(&quot;address&quot;, owner.getAddress());</span>
-<span class="nc" id="L92">		jgen.writeStringField(&quot;city&quot;, owner.getCity());</span>
-<span class="nc" id="L93">		jgen.writeStringField(&quot;telephone&quot;, owner.getTelephone());</span>
-<span class="nc" id="L94">		jgen.writeEndObject(); // owner</span>
-<span class="nc" id="L95">		jgen.writeEndObject(); // pet</span>
-<span class="nc" id="L96">		jgen.writeEndObject(); // visit</span>
-<span class="nc" id="L97">	}</span>
+<span class="fc" id="L89">		jgen.writeStringField(&quot;firstName&quot;, owner.getFirstName());</span>
+<span class="fc" id="L90">		jgen.writeStringField(&quot;lastName&quot;, owner.getLastName());</span>
+<span class="fc" id="L91">		jgen.writeStringField(&quot;address&quot;, owner.getAddress());</span>
+<span class="fc" id="L92">		jgen.writeStringField(&quot;city&quot;, owner.getCity());</span>
+<span class="fc" id="L93">		jgen.writeStringField(&quot;telephone&quot;, owner.getTelephone());</span>
+<span class="fc" id="L94">		jgen.writeEndObject(); // owner</span>
+<span class="fc" id="L95">		jgen.writeEndObject(); // pet</span>
+<span class="fc" id="L96">		jgen.writeEndObject(); // visit</span>
+<span class="fc" id="L97">	}</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

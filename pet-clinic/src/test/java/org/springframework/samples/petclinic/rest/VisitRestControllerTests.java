@@ -16,7 +16,9 @@
 
 package org.springframework.samples.petclinic.rest;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,13 +32,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.model.Owner;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.samples.petclinic.model.PetType;
@@ -51,6 +57,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.validation.BindingResult;
 
 /**
  * Test class for {@link VisitRestController}
@@ -221,6 +228,70 @@ public class VisitRestControllerTests {
     		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
         	.andExpect(status().isBadRequest());
      }
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest() {
+		VisitRestController controller = new VisitRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
+		ResponseEntity<Visit> response = controller.updateVisit(0, visits.get(0), mockBindingResult);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest1() {
+		VisitRestController controller = new VisitRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
+		ResponseEntity<Visit> response = controller.updateVisit(0, null, mockBindingResult);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest2() {
+		VisitRestController controller = new VisitRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
+		ResponseEntity<Visit> response = controller.updateVisit(0, null, mockBindingResult);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest3() {
+		Visit visit = new Visit();
+		visit.setId(4);
+		visit.setPet(null);
+		visit.setDate(new Date());
+		visit.setDescription("null pet");
+		visits.add(visit);
+
+		VisitRestController controller = new VisitRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
+		ResponseEntity<Visit> response = controller.updateVisit(4, visits.get(2), mockBindingResult);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateVisitNotFound() throws Exception {
+		given(this.clinicService.findOwnerById(anyInt())).willReturn(null);
+		Visit newVisit = visits.get(0);
+		ObjectMapper mapper = new ObjectMapper();
+		String newOwnerAsJSON = mapper.writeValueAsString(newVisit);
+
+		this.mockMvc.perform(put("/api/visits/2")
+			.content(newOwnerAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
+			.andExpect(status().isNotFound());
+	}
 
     @Test
     @WithMockUser(roles="OWNER_ADMIN")
