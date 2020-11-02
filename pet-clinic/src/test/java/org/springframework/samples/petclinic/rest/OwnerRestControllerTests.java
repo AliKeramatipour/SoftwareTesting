@@ -262,7 +262,7 @@ public class OwnerRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest() {
+	public void testUpdateOwnerExpectsBadRequest() {	//	first if, first condition true
 			OwnerRestController controller = new OwnerRestController();
 			BindingResult mockBindingResult = mock(BindingResult.class);
 			Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
@@ -273,18 +273,7 @@ public class OwnerRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest1() {
-		OwnerRestController controller = new OwnerRestController();
-		BindingResult mockBindingResult = mock(BindingResult.class);
-		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
-		ResponseEntity<Owner> response = controller.updateOwner(0, null, mockBindingResult, null);
-		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-
-	}
-
-	@Test
-	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest2() {
+	public void testUpdateOwnerExpectsBadRequest2() {	//	first if, second condition true
 		OwnerRestController controller = new OwnerRestController();
 		BindingResult mockBindingResult = mock(BindingResult.class);
 		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
@@ -295,7 +284,7 @@ public class OwnerRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerNotFound() throws Exception {
+	public void testUpdateOwnerNotFound() throws Exception {	//	second if, true
 		given(this.clinicService.findOwnerById(anyInt())).willReturn(null);
 		Owner newOwner = owners.get(0);
 		newOwner.setFirstName("James");

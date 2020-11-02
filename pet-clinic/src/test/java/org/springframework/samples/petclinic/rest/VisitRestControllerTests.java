@@ -231,7 +231,7 @@ public class VisitRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest() {
+	public void testUpdateOwnerExpectsBadRequest() {	//	first if, first condition true
 		VisitRestController controller = new VisitRestController();
 		BindingResult mockBindingResult = mock(BindingResult.class);
 		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
@@ -242,18 +242,7 @@ public class VisitRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest1() {
-		VisitRestController controller = new VisitRestController();
-		BindingResult mockBindingResult = mock(BindingResult.class);
-		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
-		ResponseEntity<Visit> response = controller.updateVisit(0, null, mockBindingResult);
-		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
-
-	}
-
-	@Test
-	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest2() {
+	public void testUpdateOwnerExpectsBadRequest2() {	//	first if, second condition true
 		VisitRestController controller = new VisitRestController();
 		BindingResult mockBindingResult = mock(BindingResult.class);
 		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
@@ -264,7 +253,7 @@ public class VisitRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateOwnerExpectsBadRequest3() {
+	public void testUpdateOwnerExpectsBadRequest3() {	//	first if, third condition true
 		Visit visit = new Visit();
 		visit.setId(4);
 		visit.setPet(null);
@@ -282,7 +271,7 @@ public class VisitRestControllerTests {
 
 	@Test
 	@WithMockUser(roles="OWNER_ADMIN")
-	public void testUpdateVisitNotFound() throws Exception {
+	public void testUpdateVisitNotFound() throws Exception {	//	second if, true
 		given(this.clinicService.findOwnerById(anyInt())).willReturn(null);
 		Visit newVisit = visits.get(0);
 		ObjectMapper mapper = new ObjectMapper();

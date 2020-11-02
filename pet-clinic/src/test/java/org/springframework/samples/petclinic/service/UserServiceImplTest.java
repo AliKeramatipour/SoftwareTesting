@@ -30,7 +30,7 @@ public class UserServiceImplTest {
 	}
 
 	@Test
-	public void saveUserTestNullRoles() {
+	public void saveUserTestNullRoles() {	// 1 - 2 - goes inside first if - first condition true
 		Mockito.when(user.getRoles()).thenReturn(null);
 		try {
 			userService.saveUser(user);
@@ -45,7 +45,7 @@ public class UserServiceImplTest {
 	}
 
 	@Test
-	public void saveUserTestEmptyRoles() {
+	public void saveUserTestEmptyRoles() {	// 1 - 2 - goes inside first if - second condition true
 		Mockito.when(user.getRoles()).thenReturn(new HashSet<>());
 		try {
 			userService.saveUser(user);
@@ -61,6 +61,7 @@ public class UserServiceImplTest {
 
 	@Test
 	public void saveUserTestNameDoesNotStartWithRoleNullUser() {
+		// 1 - 3 - 4 - 5 - 6 - 7 - 8 - 3 - 9
 		//	will go in both ifs in for
 		roles.add(role);
 
@@ -84,7 +85,9 @@ public class UserServiceImplTest {
 
 	@Test
 	public void saveUserTestNameStartsWithRoleNullUser() {
-		//	will go in both ifs in for
+		//	will go only in second if in for
+		//	1 - 3 - 4 - 6 - 7 - 8 - 3 - 9
+		//	This test is not necessary for 100% branch coverage
 		roles.add(role);
 
 		Mockito.when(user.getRoles()).thenReturn(roles);
@@ -106,8 +109,34 @@ public class UserServiceImplTest {
 	}
 
 	@Test
+	public void saveUserTestNameDoesNotStartWithRoleNotNullUser() {
+		//	will go only in fist if in for
+		//	1 - 3 - 4 - 5 - 6 - 8 - 3 - 9
+		//	This test is not necessary for 100% branch coverage
+		roles.add(role);
+
+		Mockito.when(user.getRoles()).thenReturn(roles);
+		Mockito.when(role.getName()).thenReturn("notRole");
+		Mockito.when(role.getUser()).thenReturn(user);
+
+		try {
+			userService.saveUser(user);
+
+			Mockito.verify(user, Mockito.times(3)).getRoles();
+			Mockito.verify(role, Mockito.times(2)).getName();
+			Mockito.verify(role, Mockito.times(1)).getUser();
+			Mockito.verify(role, Mockito.times(1)).setName(any(String.class));
+			Mockito.verify(role, Mockito.times(0)).setUser(any(User.class));
+			Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));
+		}catch (Exception e) {
+			fail("saveUserTestNameDoesNotStartWithRoleNotNullUser failed");
+		}
+	}
+
+	@Test
 	public void saveUserTestNameStartsWithRoleNotNullUser() {
-		//	will go in both ifs in for
+		// 1 - 3 - 4 - 6 - 8 - 3 - 9
+		//	won't go in any ifs
 		roles.add(role);
 
 		Mockito.when(user.getRoles()).thenReturn(roles);
