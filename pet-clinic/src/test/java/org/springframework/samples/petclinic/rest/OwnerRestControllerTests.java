@@ -261,19 +261,35 @@ public class OwnerRestControllerTests {
 
 
 	@Test
-	@WithMockUser(roles="OWNER_ADMIN")	//????
-	public void testUpdateOwnerHasErrors() throws Exception {
-//		given(this.bindingResult.hasErrors()).willReturn(true);
-//		Owner newOwner = owners.get(0);
-//		newOwner.setFirstName("James");
-//		ObjectMapper mapper = new ObjectMapper();
-//		String newOwnerAsJSON = mapper.writeValueAsString(newOwner);
-//
-//
-//		this.mockMvc.perform(put("/api/owners/1")
-//			.content(newOwnerAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))
-//			.andExpect(jsonPath(".$bindingResult").value(true))
-//			.andExpect(status().isBadRequest());
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest() {
+			OwnerRestController controller = new OwnerRestController();
+			BindingResult mockBindingResult = mock(BindingResult.class);
+			Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
+			ResponseEntity<Owner> response = controller.updateOwner(0, owners.get(0), mockBindingResult, null);
+			Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest1() {
+		OwnerRestController controller = new OwnerRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
+		ResponseEntity<Owner> response = controller.updateOwner(0, null, mockBindingResult, null);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+	}
+
+	@Test
+	@WithMockUser(roles="OWNER_ADMIN")
+	public void testUpdateOwnerExpectsBadRequest2() {
+		OwnerRestController controller = new OwnerRestController();
+		BindingResult mockBindingResult = mock(BindingResult.class);
+		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
+		ResponseEntity<Owner> response = controller.updateOwner(0, null, mockBindingResult, null);
+		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
 
 	}
 
