@@ -68,6 +68,8 @@ public class ClinicServiceImplTest {
 			// ------------------------	4 - 5	//	inside first if
 			Mockito.verify(pet, Mockito.times(1)).getBirthDate();
 			Mockito.verify(visit, Mockito.times(1)).getDate();
+			// if visitPetIfPossible was running, pet.getType() would've been invoked
+			Mockito.verify(pet, Mockito.times(1)).getType();
 
 			return;
 		}
@@ -104,6 +106,8 @@ public class ClinicServiceImplTest {
 			// ------------------------	4 - 5	//	inside first if
 			Mockito.verify(pet, Mockito.times(1)).getBirthDate();
 			Mockito.verify(visit, Mockito.times(1)).getDate();
+			// if visitPetIfPossible was running, pet.getType() would've been invoked
+			Mockito.verify(pet, Mockito.times(1)).getType();
 
 			return;
 		}
@@ -140,6 +144,8 @@ public class ClinicServiceImplTest {
 		// ------------------------	4 - 5	//inside *first* if
 		Mockito.verify(pet, Mockito.times(1)).getBirthDate();
 		// ------------------------
+		// if visitPetIfPossible was running, pet.getType() would've been invoked
+		Mockito.verify(pet, Mockito.times(0)).getType();
 	}
 
 	@Test
@@ -175,6 +181,8 @@ public class ClinicServiceImplTest {
 		// ------------------------	4 - 5	//inside *first* if
 		Mockito.verify(pet, Mockito.times(1)).getBirthDate();
 		// ------------------------
+		// if visitPetIfPossible was running, pet.getType() would've been invoked
+		Mockito.verify(pet, Mockito.times(0)).getType();
 	}
 
 	@Test
@@ -198,6 +206,8 @@ public class ClinicServiceImplTest {
 			// ------------------------	4	//*didn't enter first if*
 			Mockito.verify(pet, Mockito.times(0)).getBirthDate();
 			// ------------------------
+			// if visitPetIfPossible was running, pet.getType() would've been invoked
+			Mockito.verify(pet, Mockito.times(1)).getType();
 			return;
 		}
 		// ------------------------	5 - 7 - 8 - 9 - 11	//	visitPetIfPossible function was not running - didn't enter *first* if

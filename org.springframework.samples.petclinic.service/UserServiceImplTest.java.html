@@ -83,54 +83,78 @@ import static org.mockito.ArgumentMatchers.any;
 <span class="fc" id="L83">		}</span>
 <span class="fc" id="L84">	}</span>
 
-	/*
 	@Test
 	public void saveUserTestNameStartsWithRoleNullUser() {
 		//	will go only in second if in for
-		// 1 - 3 - 4 - 6 - 7 - 8 - 3 - 9
-		roles.add(role);
+		//	1 - 3 - 4 - 6 - 7 - 8 - 3 - 9
+		//	This test is not necessary for 100% branch coverage
+<span class="fc" id="L91">		roles.add(role);</span>
 
-		Mockito.when(user.getRoles()).thenReturn(roles);
-		Mockito.when(role.getName()).thenReturn(&quot;ROLE_someRole&quot;);
-		Mockito.when(role.getUser()).thenReturn(null);
+<span class="fc" id="L93">		Mockito.when(user.getRoles()).thenReturn(roles);</span>
+<span class="fc" id="L94">		Mockito.when(role.getName()).thenReturn(&quot;ROLE_someRole&quot;);</span>
+<span class="fc" id="L95">		Mockito.when(role.getUser()).thenReturn(null);</span>
 
 		try {
-			userService.saveUser(user);
+<span class="fc" id="L98">			userService.saveUser(user);</span>
 
-			Mockito.verify(user, Mockito.times(3)).getRoles();
-			Mockito.verify(role, Mockito.times(1)).getName();
-			Mockito.verify(role, Mockito.times(1)).getUser();
-			Mockito.verify(role, Mockito.times(0)).setName(any(String.class));
-			Mockito.verify(role, Mockito.times(1)).setUser(any(User.class));
-			Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));
-		}catch (Exception e) {
-			fail(&quot;saveUserTestNameDoesNotStartWithRoleNullUser failed&quot;);
-		}
-	}
-
-	 */
+<span class="fc" id="L100">			Mockito.verify(user, Mockito.times(3)).getRoles();</span>
+<span class="fc" id="L101">			Mockito.verify(role, Mockito.times(1)).getName();</span>
+<span class="fc" id="L102">			Mockito.verify(role, Mockito.times(1)).getUser();</span>
+<span class="fc" id="L103">			Mockito.verify(role, Mockito.times(0)).setName(any(String.class));</span>
+<span class="fc" id="L104">			Mockito.verify(role, Mockito.times(1)).setUser(any(User.class));</span>
+<span class="fc" id="L105">			Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));</span>
+<span class="nc" id="L106">		}catch (Exception e) {</span>
+<span class="nc" id="L107">			fail(&quot;saveUserTestNameDoesNotStartWithRoleNullUser failed&quot;);</span>
+<span class="fc" id="L108">		}</span>
+<span class="fc" id="L109">	}</span>
 
 	@Test
-	public void saveUserTestNameStartsWithRoleNotNullUser() {
-		//	won't go in any ifs
+	public void saveUserTestNameDoesNotStartWithRoleNotNullUser() {
+		//	will go only in fist if in for
+		//	1 - 3 - 4 - 5 - 6 - 8 - 3 - 9
+		//	This test is not necessary for 100% branch coverage
 <span class="fc" id="L116">		roles.add(role);</span>
 
 <span class="fc" id="L118">		Mockito.when(user.getRoles()).thenReturn(roles);</span>
-<span class="fc" id="L119">		Mockito.when(role.getName()).thenReturn(&quot;ROLE_someRole&quot;);</span>
+<span class="fc" id="L119">		Mockito.when(role.getName()).thenReturn(&quot;notRole&quot;);</span>
 <span class="fc" id="L120">		Mockito.when(role.getUser()).thenReturn(user);</span>
 
 		try {
 <span class="fc" id="L123">			userService.saveUser(user);</span>
 
 <span class="fc" id="L125">			Mockito.verify(user, Mockito.times(3)).getRoles();</span>
-<span class="fc" id="L126">			Mockito.verify(role, Mockito.times(1)).getName();</span>
+<span class="fc" id="L126">			Mockito.verify(role, Mockito.times(2)).getName();</span>
 <span class="fc" id="L127">			Mockito.verify(role, Mockito.times(1)).getUser();</span>
-<span class="fc" id="L128">			Mockito.verify(role, Mockito.times(0)).setName(any(String.class));</span>
+<span class="fc" id="L128">			Mockito.verify(role, Mockito.times(1)).setName(any(String.class));</span>
 <span class="fc" id="L129">			Mockito.verify(role, Mockito.times(0)).setUser(any(User.class));</span>
 <span class="fc" id="L130">			Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));</span>
 <span class="nc" id="L131">		}catch (Exception e) {</span>
-<span class="nc" id="L132">			fail(&quot;saveUserTestNameDoesNotStartWithRoleNullUser failed&quot;);</span>
+<span class="nc" id="L132">			fail(&quot;saveUserTestNameDoesNotStartWithRoleNotNullUser failed&quot;);</span>
 <span class="fc" id="L133">		}</span>
 <span class="fc" id="L134">	}</span>
+
+	@Test
+	public void saveUserTestNameStartsWithRoleNotNullUser() {
+		// 1 - 3 - 4 - 6 - 8 - 3 - 9
+		//	won't go in any ifs
+<span class="fc" id="L140">		roles.add(role);</span>
+
+<span class="fc" id="L142">		Mockito.when(user.getRoles()).thenReturn(roles);</span>
+<span class="fc" id="L143">		Mockito.when(role.getName()).thenReturn(&quot;ROLE_someRole&quot;);</span>
+<span class="fc" id="L144">		Mockito.when(role.getUser()).thenReturn(user);</span>
+
+		try {
+<span class="fc" id="L147">			userService.saveUser(user);</span>
+
+<span class="fc" id="L149">			Mockito.verify(user, Mockito.times(3)).getRoles();</span>
+<span class="fc" id="L150">			Mockito.verify(role, Mockito.times(1)).getName();</span>
+<span class="fc" id="L151">			Mockito.verify(role, Mockito.times(1)).getUser();</span>
+<span class="fc" id="L152">			Mockito.verify(role, Mockito.times(0)).setName(any(String.class));</span>
+<span class="fc" id="L153">			Mockito.verify(role, Mockito.times(0)).setUser(any(User.class));</span>
+<span class="fc" id="L154">			Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));</span>
+<span class="nc" id="L155">		}catch (Exception e) {</span>
+<span class="nc" id="L156">			fail(&quot;saveUserTestNameDoesNotStartWithRoleNullUser failed&quot;);</span>
+<span class="fc" id="L157">		}</span>
+<span class="fc" id="L158">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
