@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VetRestControllerTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$VisitRestControllerTests.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">VetRestControllerTests.java</span></div><h1>VetRestControllerTests.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.service.clinicService.ApplicationTestConfig;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * Test class for {@link VetRestController}
+ *
+ * @author Vitaliy Fedoriv
+ */
+@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=ApplicationTestConfig.class)
+@WebAppConfiguration
+<span class="nc" id="L59">public class VetRestControllerTests {</span>
+
+    @Autowired
+    private VetRestController vetRestController;
+
+	@MockBean
+    private ClinicService clinicService;
+
+    private MockMvc mockMvc;
+
+    private List&lt;Vet&gt; vets;
+
+    @Before
+    public void initVets(){
+<span class="nc" id="L73">    	this.mockMvc = MockMvcBuilders.standaloneSetup(vetRestController)</span>
+<span class="nc" id="L74">    			.setControllerAdvice(new ExceptionControllerAdvice())</span>
+<span class="nc" id="L75">    			.build();</span>
+<span class="nc" id="L76">    	vets = new ArrayList&lt;Vet&gt;();</span>
+
+
+<span class="nc" id="L79">    	Vet vet = new Vet();</span>
+<span class="nc" id="L80">    	vet.setId(1);</span>
+<span class="nc" id="L81">    	vet.setFirstName(&quot;James&quot;);</span>
+<span class="nc" id="L82">    	vet.setLastName(&quot;Carter&quot;);</span>
+<span class="nc" id="L83">    	vets.add(vet);</span>
+
+<span class="nc" id="L85">    	vet = new Vet();</span>
+<span class="nc" id="L86">    	vet.setId(2);</span>
+<span class="nc" id="L87">    	vet.setFirstName(&quot;Helen&quot;);</span>
+<span class="nc" id="L88">    	vet.setLastName(&quot;Leary&quot;);</span>
+<span class="nc" id="L89">    	vets.add(vet);</span>
+
+<span class="nc" id="L91">    	vet = new Vet();</span>
+<span class="nc" id="L92">    	vet.setId(3);</span>
+<span class="nc" id="L93">    	vet.setFirstName(&quot;Linda&quot;);</span>
+<span class="nc" id="L94">    	vet.setLastName(&quot;Douglas&quot;);</span>
+<span class="nc" id="L95">    	vets.add(vet);</span>
+<span class="nc" id="L96">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetVetSuccess() throws Exception {
+<span class="nc" id="L101">    	given(this.clinicService.findVetById(1)).willReturn(vets.get(0));</span>
+<span class="nc" id="L102">        this.mockMvc.perform(get(&quot;/api/vets/1&quot;)</span>
+<span class="nc" id="L103">        	.accept(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L104">            .andExpect(status().isOk())</span>
+<span class="nc" id="L105">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L106">            .andExpect(jsonPath(&quot;$.id&quot;).value(1))</span>
+<span class="nc" id="L107">            .andExpect(jsonPath(&quot;$.firstName&quot;).value(&quot;James&quot;));</span>
+<span class="nc" id="L108">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetVetNotFound() throws Exception {
+<span class="nc" id="L113">    	given(this.clinicService.findVetById(-1)).willReturn(null);</span>
+<span class="nc" id="L114">        this.mockMvc.perform(get(&quot;/api/vets/-1&quot;)</span>
+<span class="nc" id="L115">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L116">            .andExpect(status().isNotFound());</span>
+<span class="nc" id="L117">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetAllVetsSuccess() throws Exception {
+<span class="nc" id="L122">    	given(this.clinicService.findAllVets()).willReturn(vets);</span>
+<span class="nc" id="L123">        this.mockMvc.perform(get(&quot;/api/vets/&quot;)</span>
+<span class="nc" id="L124">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L125">            .andExpect(status().isOk())</span>
+<span class="nc" id="L126">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L127">            .andExpect(jsonPath(&quot;$.[0].id&quot;).value(1))</span>
+<span class="nc" id="L128">            .andExpect(jsonPath(&quot;$.[0].firstName&quot;).value(&quot;James&quot;))</span>
+<span class="nc" id="L129">            .andExpect(jsonPath(&quot;$.[1].id&quot;).value(2))</span>
+<span class="nc" id="L130">            .andExpect(jsonPath(&quot;$.[1].firstName&quot;).value(&quot;Helen&quot;));</span>
+<span class="nc" id="L131">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetAllVetsNotFound() throws Exception {
+<span class="nc" id="L136">    	vets.clear();</span>
+<span class="nc" id="L137">    	given(this.clinicService.findAllVets()).willReturn(vets);</span>
+<span class="nc" id="L138">        this.mockMvc.perform(get(&quot;/api/vets/&quot;)</span>
+<span class="nc" id="L139">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L140">            .andExpect(status().isNotFound());</span>
+<span class="nc" id="L141">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testCreateVetSuccess() throws Exception {
+<span class="nc" id="L146">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L147">    	newVet.setId(999);</span>
+<span class="nc" id="L148">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L149">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L150">    	this.mockMvc.perform(post(&quot;/api/vets/&quot;)</span>
+<span class="nc" id="L151">    		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L152">    		.andExpect(status().isCreated());</span>
+<span class="nc" id="L153">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testCreateVetError() throws Exception {
+<span class="nc" id="L158">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L159">    	newVet.setId(null);</span>
+<span class="nc" id="L160">    	newVet.setFirstName(null);</span>
+<span class="nc" id="L161">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L162">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L163">    	this.mockMvc.perform(post(&quot;/api/vets/&quot;)</span>
+<span class="nc" id="L164">        		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L165">        		.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L166">     }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testUpdateVetSuccess() throws Exception {
+<span class="nc" id="L171">    	given(this.clinicService.findVetById(1)).willReturn(vets.get(0));</span>
+<span class="nc" id="L172">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L173">    	newVet.setFirstName(&quot;James&quot;);</span>
+<span class="nc" id="L174">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L175">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L176">    	this.mockMvc.perform(put(&quot;/api/vets/1&quot;)</span>
+<span class="nc" id="L177">    		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L178">        	.andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L179">        	.andExpect(status().isNoContent());</span>
+
+<span class="nc" id="L181">    	this.mockMvc.perform(get(&quot;/api/vets/1&quot;)</span>
+<span class="nc" id="L182">           	.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L183">            .andExpect(status().isOk())</span>
+<span class="nc" id="L184">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L185">            .andExpect(jsonPath(&quot;$.id&quot;).value(1))</span>
+<span class="nc" id="L186">            .andExpect(jsonPath(&quot;$.firstName&quot;).value(&quot;James&quot;));</span>
+
+<span class="nc" id="L188">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testUpdateVetError() throws Exception {
+<span class="nc" id="L193">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L194">    	newVet.setFirstName(&quot;&quot;);</span>
+<span class="nc" id="L195">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L196">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L197">    	this.mockMvc.perform(put(&quot;/api/vets/1&quot;)</span>
+<span class="nc" id="L198">    		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L199">        	.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L200">     }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testDeleteVetSuccess() throws Exception {
+<span class="nc" id="L205">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L206">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L207">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L208">    	given(this.clinicService.findVetById(1)).willReturn(vets.get(0));</span>
+<span class="nc" id="L209">    	this.mockMvc.perform(delete(&quot;/api/vets/1&quot;)</span>
+<span class="nc" id="L210">    		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L211">        	.andExpect(status().isNoContent());</span>
+<span class="nc" id="L212">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testDeleteVetError() throws Exception {
+<span class="nc" id="L217">    	Vet newVet = vets.get(0);</span>
+<span class="nc" id="L218">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L219">    	String newVetAsJSON = mapper.writeValueAsString(newVet);</span>
+<span class="nc" id="L220">    	given(this.clinicService.findVetById(-1)).willReturn(null);</span>
+<span class="nc" id="L221">    	this.mockMvc.perform(delete(&quot;/api/vets/-1&quot;)</span>
+<span class="nc" id="L222">    		.content(newVetAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L223">        	.andExpect(status().isNotFound());</span>
+<span class="nc" id="L224">    }</span>
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

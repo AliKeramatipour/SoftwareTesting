@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpecialtyRestControllerTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$VisitRestControllerTests.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">SpecialtyRestControllerTests.java</span></div><h1>SpecialtyRestControllerTests.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.model.Specialty;
+import org.springframework.samples.petclinic.service.clinicService.ApplicationTestConfig;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * Test class for {@link SpecialtyRestController}
+ *
+ * @author Vitaliy Fedoriv
+ */
+@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=ApplicationTestConfig.class)
+@WebAppConfiguration
+<span class="nc" id="L59">public class SpecialtyRestControllerTests {</span>
+
+    @Autowired
+    private SpecialtyRestController specialtyRestController;
+
+	@MockBean
+    private ClinicService clinicService;
+
+    private MockMvc mockMvc;
+
+    private List&lt;Specialty&gt; specialties;
+
+    @Before
+    public void initSpecialtys(){
+<span class="nc" id="L73">    	this.mockMvc = MockMvcBuilders.standaloneSetup(specialtyRestController)</span>
+<span class="nc" id="L74">    			.setControllerAdvice(new ExceptionControllerAdvice())</span>
+<span class="nc" id="L75">    			.build();</span>
+<span class="nc" id="L76">    	specialties = new ArrayList&lt;Specialty&gt;();</span>
+
+<span class="nc" id="L78">    	Specialty specialty = new Specialty();</span>
+<span class="nc" id="L79">    	specialty.setId(1);</span>
+<span class="nc" id="L80">    	specialty.setName(&quot;radiology&quot;);</span>
+<span class="nc" id="L81">    	specialties.add(specialty);</span>
+
+<span class="nc" id="L83">    	specialty = new Specialty();</span>
+<span class="nc" id="L84">    	specialty.setId(2);</span>
+<span class="nc" id="L85">    	specialty.setName(&quot;surgery&quot;);</span>
+<span class="nc" id="L86">    	specialties.add(specialty);</span>
+
+<span class="nc" id="L88">    	specialty = new Specialty();</span>
+<span class="nc" id="L89">    	specialty.setId(3);</span>
+<span class="nc" id="L90">    	specialty.setName(&quot;dentistry&quot;);</span>
+<span class="nc" id="L91">    	specialties.add(specialty);</span>
+
+<span class="nc" id="L93">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetSpecialtySuccess() throws Exception {
+<span class="nc" id="L98">    	given(this.clinicService.findSpecialtyById(1)).willReturn(specialties.get(0));</span>
+<span class="nc" id="L99">        this.mockMvc.perform(get(&quot;/api/specialties/1&quot;)</span>
+<span class="nc" id="L100">        	.accept(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L101">            .andExpect(status().isOk())</span>
+<span class="nc" id="L102">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L103">            .andExpect(jsonPath(&quot;$.id&quot;).value(1))</span>
+<span class="nc" id="L104">            .andExpect(jsonPath(&quot;$.name&quot;).value(&quot;radiology&quot;));</span>
+<span class="nc" id="L105">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetSpecialtyNotFound() throws Exception {
+<span class="nc" id="L110">    	given(this.clinicService.findSpecialtyById(-1)).willReturn(null);</span>
+<span class="nc" id="L111">        this.mockMvc.perform(get(&quot;/api/specialties/-1&quot;)</span>
+<span class="nc" id="L112">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L113">            .andExpect(status().isNotFound());</span>
+<span class="nc" id="L114">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetAllSpecialtysSuccess() throws Exception {
+<span class="nc" id="L119">    	specialties.remove(0);</span>
+<span class="nc" id="L120">    	given(this.clinicService.findAllSpecialties()).willReturn(specialties);</span>
+<span class="nc" id="L121">        this.mockMvc.perform(get(&quot;/api/specialties/&quot;)</span>
+<span class="nc" id="L122">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L123">            .andExpect(status().isOk())</span>
+<span class="nc" id="L124">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L125">        	.andExpect(jsonPath(&quot;$.[0].id&quot;).value(2))</span>
+<span class="nc" id="L126">        	.andExpect(jsonPath(&quot;$.[0].name&quot;).value(&quot;surgery&quot;))</span>
+<span class="nc" id="L127">        	.andExpect(jsonPath(&quot;$.[1].id&quot;).value(3))</span>
+<span class="nc" id="L128">        	.andExpect(jsonPath(&quot;$.[1].name&quot;).value(&quot;dentistry&quot;));</span>
+<span class="nc" id="L129">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testGetAllSpecialtysNotFound() throws Exception {
+<span class="nc" id="L134">    	specialties.clear();</span>
+<span class="nc" id="L135">    	given(this.clinicService.findAllSpecialties()).willReturn(specialties);</span>
+<span class="nc" id="L136">        this.mockMvc.perform(get(&quot;/api/specialties/&quot;)</span>
+<span class="nc" id="L137">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="nc" id="L138">            .andExpect(status().isNotFound());</span>
+<span class="nc" id="L139">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testCreateSpecialtySuccess() throws Exception {
+<span class="nc" id="L144">    	Specialty newSpecialty = specialties.get(0);</span>
+<span class="nc" id="L145">    	newSpecialty.setId(999);</span>
+<span class="nc" id="L146">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L147">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L148">    	this.mockMvc.perform(post(&quot;/api/specialties/&quot;)</span>
+<span class="nc" id="L149">    		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L150">    		.andExpect(status().isCreated());</span>
+<span class="nc" id="L151">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testCreateSpecialtyError() throws Exception {
+<span class="nc" id="L156">    	Specialty newSpecialty = specialties.get(0);</span>
+<span class="nc" id="L157">    	newSpecialty.setId(null);</span>
+<span class="nc" id="L158">    	newSpecialty.setName(null);</span>
+<span class="nc" id="L159">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L160">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L161">    	this.mockMvc.perform(post(&quot;/api/specialties/&quot;)</span>
+<span class="nc" id="L162">        		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L163">        		.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L164">     }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testUpdateSpecialtySuccess() throws Exception {
+<span class="nc" id="L169">    	given(this.clinicService.findSpecialtyById(2)).willReturn(specialties.get(1));</span>
+<span class="nc" id="L170">    	Specialty newSpecialty = specialties.get(1);</span>
+<span class="nc" id="L171">    	newSpecialty.setName(&quot;surgery I&quot;);</span>
+<span class="nc" id="L172">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L173">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L174">    	this.mockMvc.perform(put(&quot;/api/specialties/2&quot;)</span>
+<span class="nc" id="L175">    		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L176">        	.andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L177">        	.andExpect(status().isNoContent());</span>
+
+<span class="nc" id="L179">    	this.mockMvc.perform(get(&quot;/api/specialties/2&quot;)</span>
+<span class="nc" id="L180">           	.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L181">            .andExpect(status().isOk())</span>
+<span class="nc" id="L182">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="nc" id="L183">            .andExpect(jsonPath(&quot;$.id&quot;).value(2))</span>
+<span class="nc" id="L184">            .andExpect(jsonPath(&quot;$.name&quot;).value(&quot;surgery I&quot;));</span>
+<span class="nc" id="L185">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testUpdateSpecialtyError() throws Exception {
+<span class="nc" id="L190">    	Specialty newSpecialty = specialties.get(0);</span>
+<span class="nc" id="L191">    	newSpecialty.setName(&quot;&quot;);</span>
+<span class="nc" id="L192">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L193">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L194">    	this.mockMvc.perform(put(&quot;/api/specialties/1&quot;)</span>
+<span class="nc" id="L195">    		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L196">        	.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L197">     }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testDeleteSpecialtySuccess() throws Exception {
+<span class="nc" id="L202">    	Specialty newSpecialty = specialties.get(0);</span>
+<span class="nc" id="L203">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L204">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L205">    	given(this.clinicService.findSpecialtyById(1)).willReturn(specialties.get(0));</span>
+<span class="nc" id="L206">    	this.mockMvc.perform(delete(&quot;/api/specialties/1&quot;)</span>
+<span class="nc" id="L207">    		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L208">        	.andExpect(status().isNoContent());</span>
+<span class="nc" id="L209">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;VET_ADMIN&quot;)
+    public void testDeleteSpecialtyError() throws Exception {
+<span class="nc" id="L214">    	Specialty newSpecialty = specialties.get(0);</span>
+<span class="nc" id="L215">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L216">    	String newSpecialtyAsJSON = mapper.writeValueAsString(newSpecialty);</span>
+<span class="nc" id="L217">    	given(this.clinicService.findSpecialtyById(-1)).willReturn(null);</span>
+<span class="nc" id="L218">    	this.mockMvc.perform(delete(&quot;/api/specialties/-1&quot;)</span>
+<span class="nc" id="L219">    		.content(newSpecialtyAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L220">        	.andExpect(status().isNotFound());</span>
+<span class="nc" id="L221">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

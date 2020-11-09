@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VisitRestControllerTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring_petclinic_rest$VisitRestControllerTests.exec</a> &gt; <a href="index.source.html" class="el_package">org.springframework.samples.petclinic.rest</a> &gt; <span class="el_source">VisitRestControllerTests.java</span></div><h1>VisitRestControllerTests.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.springframework.samples.petclinic.rest;
+
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.PetType;
+import org.springframework.samples.petclinic.model.Visit;
+import org.springframework.samples.petclinic.service.clinicService.ApplicationTestConfig;
+import org.springframework.samples.petclinic.service.ClinicService;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.validation.BindingResult;
+
+/**
+ * Test class for {@link VisitRestController}
+ *
+ * @author Vitaliy Fedoriv
+ */
+@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes=ApplicationTestConfig.class)
+@WebAppConfiguration
+<span class="fc" id="L71">public class VisitRestControllerTests {</span>
+
+    @Autowired
+    private VisitRestController visitRestController;
+
+    @MockBean
+    private ClinicService clinicService;
+
+    private MockMvc mockMvc;
+
+    private List&lt;Visit&gt; visits;
+
+    @Before
+    public void initVisits(){
+<span class="fc" id="L85">    	this.mockMvc = MockMvcBuilders.standaloneSetup(visitRestController)</span>
+<span class="fc" id="L86">    			.setControllerAdvice(new ExceptionControllerAdvice())</span>
+<span class="fc" id="L87">    			.build();</span>
+
+<span class="fc" id="L89">    	visits = new ArrayList&lt;Visit&gt;();</span>
+
+<span class="fc" id="L91">    	Owner owner = new Owner();</span>
+<span class="fc" id="L92">    	owner.setId(1);</span>
+<span class="fc" id="L93">    	owner.setFirstName(&quot;Eduardo&quot;);</span>
+<span class="fc" id="L94">    	owner.setLastName(&quot;Rodriquez&quot;);</span>
+<span class="fc" id="L95">    	owner.setAddress(&quot;2693 Commerce St.&quot;);</span>
+<span class="fc" id="L96">    	owner.setCity(&quot;McFarland&quot;);</span>
+<span class="fc" id="L97">    	owner.setTelephone(&quot;6085558763&quot;);</span>
+
+<span class="fc" id="L99">    	PetType petType = new PetType();</span>
+<span class="fc" id="L100">    	petType.setId(2);</span>
+<span class="fc" id="L101">    	petType.setName(&quot;dog&quot;);</span>
+
+<span class="fc" id="L103">    	Pet pet = new Pet();</span>
+<span class="fc" id="L104">    	pet.setId(8);</span>
+<span class="fc" id="L105">    	pet.setName(&quot;Rosy&quot;);</span>
+<span class="fc" id="L106">    	pet.setBirthDate(new Date());</span>
+<span class="fc" id="L107">    	pet.setOwner(owner);</span>
+<span class="fc" id="L108">    	pet.setType(petType);</span>
+
+
+<span class="fc" id="L111">    	Visit visit = new Visit();</span>
+<span class="fc" id="L112">    	visit.setId(2);</span>
+<span class="fc" id="L113">    	visit.setPet(pet);</span>
+<span class="fc" id="L114">    	visit.setDate(new Date());</span>
+<span class="fc" id="L115">    	visit.setDescription(&quot;rabies shot&quot;);</span>
+<span class="fc" id="L116">    	visits.add(visit);</span>
+
+<span class="fc" id="L118">    	visit = new Visit();</span>
+<span class="fc" id="L119">    	visit.setId(3);</span>
+<span class="fc" id="L120">    	visit.setPet(pet);</span>
+<span class="fc" id="L121">    	visit.setDate(new Date());</span>
+<span class="fc" id="L122">    	visit.setDescription(&quot;neutered&quot;);</span>
+<span class="fc" id="L123">    	visits.add(visit);</span>
+
+
+<span class="fc" id="L126">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testGetVisitSuccess() throws Exception {
+<span class="fc" id="L131">    	given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));</span>
+<span class="fc" id="L132">        this.mockMvc.perform(get(&quot;/api/visits/2&quot;)</span>
+<span class="fc" id="L133">        	.accept(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L134">            .andExpect(status().isOk())</span>
+<span class="fc" id="L135">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="fc" id="L136">            .andExpect(jsonPath(&quot;$.id&quot;).value(2))</span>
+<span class="fc" id="L137">            .andExpect(jsonPath(&quot;$.description&quot;).value(&quot;rabies shot&quot;));</span>
+<span class="fc" id="L138">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testGetVisitNotFound() throws Exception {
+<span class="fc" id="L143">    	given(this.clinicService.findVisitById(-1)).willReturn(null);</span>
+<span class="fc" id="L144">        this.mockMvc.perform(get(&quot;/api/visits/-1&quot;)</span>
+<span class="fc" id="L145">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="fc" id="L146">            .andExpect(status().isNotFound());</span>
+<span class="fc" id="L147">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testGetAllVisitsSuccess() throws Exception {
+<span class="fc" id="L152">    	given(this.clinicService.findAllVisits()).willReturn(visits);</span>
+<span class="fc" id="L153">        this.mockMvc.perform(get(&quot;/api/visits/&quot;)</span>
+<span class="fc" id="L154">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="fc" id="L155">            .andExpect(status().isOk())</span>
+<span class="fc" id="L156">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="fc" id="L157">        	.andExpect(jsonPath(&quot;$.[0].id&quot;).value(2))</span>
+<span class="fc" id="L158">        	.andExpect(jsonPath(&quot;$.[0].description&quot;).value(&quot;rabies shot&quot;))</span>
+<span class="fc" id="L159">        	.andExpect(jsonPath(&quot;$.[1].id&quot;).value(3))</span>
+<span class="fc" id="L160">        	.andExpect(jsonPath(&quot;$.[1].description&quot;).value(&quot;neutered&quot;));</span>
+<span class="fc" id="L161">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testGetAllVisitsNotFound() throws Exception {
+<span class="fc" id="L166">    	visits.clear();</span>
+<span class="fc" id="L167">    	given(this.clinicService.findAllVisits()).willReturn(visits);</span>
+<span class="fc" id="L168">        this.mockMvc.perform(get(&quot;/api/visits/&quot;)</span>
+<span class="fc" id="L169">        	.accept(MediaType.APPLICATION_JSON))</span>
+<span class="fc" id="L170">            .andExpect(status().isNotFound());</span>
+<span class="fc" id="L171">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testCreateVisitSuccess() throws Exception {
+<span class="fc" id="L176">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L177">    	newVisit.setId(999);</span>
+<span class="fc" id="L178">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L179">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="fc" id="L180">    	System.out.println(&quot;newVisitAsJSON &quot; + newVisitAsJSON);</span>
+<span class="fc" id="L181">    	this.mockMvc.perform(post(&quot;/api/visits/&quot;)</span>
+<span class="fc" id="L182">    		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L183">    		.andExpect(status().isCreated());</span>
+<span class="fc" id="L184">    }</span>
+
+    @Test(expected = IOException.class)
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testCreateVisitError() throws Exception {
+<span class="fc" id="L189">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L190">    	newVisit.setId(null);</span>
+<span class="fc" id="L191">    	newVisit.setPet(null);</span>
+<span class="fc" id="L192">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L193">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="nc" id="L194">    	this.mockMvc.perform(post(&quot;/api/visits/&quot;)</span>
+<span class="nc" id="L195">        		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L196">        		.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L197">     }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testUpdateVisitSuccess() throws Exception {
+<span class="fc" id="L202">    	given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));</span>
+<span class="fc" id="L203">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L204">    	newVisit.setDescription(&quot;rabies shot test&quot;);</span>
+<span class="fc" id="L205">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L206">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="fc" id="L207">    	this.mockMvc.perform(put(&quot;/api/visits/2&quot;)</span>
+<span class="fc" id="L208">    		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L209">        	.andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="fc" id="L210">        	.andExpect(status().isNoContent());</span>
+
+<span class="fc" id="L212">    	this.mockMvc.perform(get(&quot;/api/visits/2&quot;)</span>
+<span class="fc" id="L213">           	.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L214">            .andExpect(status().isOk())</span>
+<span class="fc" id="L215">            .andExpect(content().contentType(&quot;application/json;charset=UTF-8&quot;))</span>
+<span class="fc" id="L216">            .andExpect(jsonPath(&quot;$.id&quot;).value(2))</span>
+<span class="fc" id="L217">            .andExpect(jsonPath(&quot;$.description&quot;).value(&quot;rabies shot test&quot;));</span>
+<span class="fc" id="L218">    }</span>
+
+    @Test(expected = IOException.class)
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testUpdateVisitError() throws Exception {
+<span class="fc" id="L223">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L224">    	newVisit.setPet(null);</span>
+<span class="fc" id="L225">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L226">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="nc" id="L227">    	this.mockMvc.perform(put(&quot;/api/visits/2&quot;)</span>
+<span class="nc" id="L228">    		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="nc" id="L229">        	.andExpect(status().isBadRequest());</span>
+<span class="nc" id="L230">     }</span>
+
+	@Test
+	@WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+	public void testUpdateOwnerExpectsBadRequest() {	//	first if, first condition true
+<span class="fc" id="L235">		VisitRestController controller = new VisitRestController();</span>
+<span class="fc" id="L236">		BindingResult mockBindingResult = mock(BindingResult.class);</span>
+<span class="fc" id="L237">		Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);</span>
+<span class="fc" id="L238">		ResponseEntity&lt;Visit&gt; response = controller.updateVisit(0, visits.get(0), mockBindingResult);</span>
+<span class="fc" id="L239">		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);</span>
+
+<span class="fc" id="L241">	}</span>
+
+	@Test
+	@WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+	public void testUpdateOwnerExpectsBadRequest2() {	//	first if, second condition true
+<span class="fc" id="L246">		VisitRestController controller = new VisitRestController();</span>
+<span class="fc" id="L247">		BindingResult mockBindingResult = mock(BindingResult.class);</span>
+<span class="fc" id="L248">		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);</span>
+<span class="fc" id="L249">		ResponseEntity&lt;Visit&gt; response = controller.updateVisit(0, null, mockBindingResult);</span>
+<span class="fc" id="L250">		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);</span>
+
+<span class="fc" id="L252">	}</span>
+
+	@Test
+	@WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+	public void testUpdateOwnerExpectsBadRequest3() {	//	first if, third condition true
+<span class="fc" id="L257">		Visit visit = new Visit();</span>
+<span class="fc" id="L258">		visit.setId(4);</span>
+<span class="fc" id="L259">		visit.setPet(null);</span>
+<span class="fc" id="L260">		visit.setDate(new Date());</span>
+<span class="fc" id="L261">		visit.setDescription(&quot;null pet&quot;);</span>
+<span class="fc" id="L262">		visits.add(visit);</span>
+
+<span class="fc" id="L264">		VisitRestController controller = new VisitRestController();</span>
+<span class="fc" id="L265">		BindingResult mockBindingResult = mock(BindingResult.class);</span>
+<span class="fc" id="L266">		Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);</span>
+<span class="fc" id="L267">		ResponseEntity&lt;Visit&gt; response = controller.updateVisit(4, visits.get(2), mockBindingResult);</span>
+<span class="fc" id="L268">		Assert.assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);</span>
+
+<span class="fc" id="L270">	}</span>
+
+	@Test
+	@WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+	public void testUpdateVisitNotFound() throws Exception {	//	second if, true
+<span class="fc" id="L275">		given(this.clinicService.findOwnerById(anyInt())).willReturn(null);</span>
+<span class="fc" id="L276">		Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L277">		ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L278">		String newOwnerAsJSON = mapper.writeValueAsString(newVisit);</span>
+
+<span class="fc" id="L280">		this.mockMvc.perform(put(&quot;/api/visits/2&quot;)</span>
+<span class="fc" id="L281">			.content(newOwnerAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L282">			.andExpect(status().isNotFound());</span>
+<span class="fc" id="L283">	}</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testDeleteVisitSuccess() throws Exception {
+<span class="fc" id="L288">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L289">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L290">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="fc" id="L291">    	given(this.clinicService.findVisitById(2)).willReturn(visits.get(0));</span>
+<span class="fc" id="L292">    	this.mockMvc.perform(delete(&quot;/api/visits/2&quot;)</span>
+<span class="fc" id="L293">    		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L294">        	.andExpect(status().isNoContent());</span>
+<span class="fc" id="L295">    }</span>
+
+    @Test
+    @WithMockUser(roles=&quot;OWNER_ADMIN&quot;)
+    public void testDeleteVisitError() throws Exception {
+<span class="fc" id="L300">    	Visit newVisit = visits.get(0);</span>
+<span class="fc" id="L301">    	ObjectMapper mapper = new ObjectMapper();</span>
+<span class="fc" id="L302">    	String newVisitAsJSON = mapper.writeValueAsString(newVisit);</span>
+<span class="fc" id="L303">    	given(this.clinicService.findVisitById(-1)).willReturn(null);</span>
+<span class="fc" id="L304">    	this.mockMvc.perform(delete(&quot;/api/visits/-1&quot;)</span>
+<span class="fc" id="L305">    		.content(newVisitAsJSON).accept(MediaType.APPLICATION_JSON_VALUE).contentType(MediaType.APPLICATION_JSON_VALUE))</span>
+<span class="fc" id="L306">        	.andExpect(status().isNotFound());</span>
+<span class="fc" id="L307">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
