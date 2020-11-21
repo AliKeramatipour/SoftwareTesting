@@ -4,9 +4,10 @@ import com.github.mryf323.tractatus.*;
 import com.github.mryf323.tractatus.experimental.extensions.ReportingExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(ReportingExtension.class)
 @ClauseDefinition(clause = 'a', def = "Side1 <= 0")
@@ -17,18 +18,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ClauseDefinition(clause = 'f', def = "Side1+Side3 <= Side2")
 class TriTypeTest {
 
-//	private static final Logger log = LoggerFactory.getLogger(TriTypeTest.class);
-//
-//	@Test
-//	public void sampleTest() {
-//		TriType tryType = new TriType();
-//		TriType.TryClass triClass;
-//		triClass = tryType.classifyTriangle(1,1,1);
-//		log.debug("triangle identified as {}", triClass);
-//		Assertions.assertEquals(TriType.TryClass.EQUILATERAL, triClass);
-//	}
+	private static final Logger log = LoggerFactory.getLogger(TriTypeTest.class);
 
-	//	--------------------	CLAUSE COVERAGE -------------------------------------------
+	@Test
+	public void sampleTest() {
+		TriType tryType = new TriType();
+		TriType.TryClass triClass;
+		triClass = tryType.classifyTriangle(1,1,1);
+		log.debug("triangle identified as {}", triClass);
+		assertEquals(TriType.TryClass.EQUILATERAL, triClass);
+	}
 
 	public boolean firstPredicate(int Side1, int Side2, int Side3) {
 		if(Side1 <= 0 || Side2 <= 0 || Side3 <= 0) {
@@ -46,272 +45,9 @@ class TriTypeTest {
 		}
 	}
 
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	all true
-	@ClauseCoverage(
-		predicate = "a + b + c",
-		valuations = {
-			@Valuation(clause = 'a', valuation = true),
-			@Valuation(clause = 'b', valuation = true),
-			@Valuation(clause = 'c', valuation = true)
-		}
-	)
-	@Test
-	public void ccCoverageTest() {
-		assertTrue(firstPredicate(-1, -1, -1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	all false
-	@ClauseCoverage(
-		predicate = "a + b + c",
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = false)
-		}
-	)
-	@Test
-	public void ccCoverageTest0() {
-		assertFalse(firstPredicate(3, 4, 5));
-	}
-
-	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2
-	@ClauseCoverage(
-		predicate = "d + e + f",
-		valuations = {
-			@Valuation(clause = 'd', valuation = true),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = false)
-		}
-	)
-	@Test
-	public void ccCoverageTest1() {
-		assertTrue(secondPredicate(3, 4, 50));
-	}
-
-	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2
-	@ClauseCoverage(
-		predicate = "d + e + f",
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = true),
-			@Valuation(clause = 'f', valuation = false)
-		}
-	)
-	@Test
-	public void ccCoverageTest2() {
-		assertTrue(secondPredicate(30, 4, 5));
-	}
-
-	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2
-	@ClauseCoverage(
-		predicate = "d + e + f",
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = true)
-		}
-	)
-	@Test
-	public void ccCoverageTest3() {
-		assertTrue(secondPredicate(3, 40, 5));
-	}
-
-	//	-----------------------------------------------------------------------------------
-
-	//	--------------------	CACC COVERAGE ---------------------------------------------
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'a',
-		valuations = {
-			@Valuation(clause = 'a', valuation = true),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = false)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest() {
-		assertTrue(firstPredicate(-1, 1, 1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'a',
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest0() {
-		assertFalse(firstPredicate(1, 1, 1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'b',
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = true),
-			@Valuation(clause = 'c', valuation = false)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest1() {
-		assertTrue(firstPredicate(1, -1, 1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'b',
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest2() {
-		assertFalse(firstPredicate(1, 1, 1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'c',
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = true)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest3() {
-		assertTrue(firstPredicate(1, 1, -1));
-	}
-
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
-	@CACC(
-		predicate ="a + b + c",
-		majorClause = 'c',
-		valuations = {
-			@Valuation(clause = 'a', valuation = false),
-			@Valuation(clause = 'b', valuation = false),
-			@Valuation(clause = 'c', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest4() {
-		assertFalse(firstPredicate(1, 1, 1));
-	}
-
-	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'd',
-		valuations = {
-			@Valuation(clause = 'd', valuation = true),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = false)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest5() {
-		assertTrue(secondPredicate(30, 4, 5));
-	}
-
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'd',
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest6() {
-		assertFalse(secondPredicate(3, 4, 5));
-	}
-
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'e',
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = true),
-			@Valuation(clause = 'f', valuation = false)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest7() {
-		assertTrue(secondPredicate(30, 4, 5));
-	}
-
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'e',
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest8() {
-		assertFalse(secondPredicate(3, 4, 5));
-	}
-
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'f',
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = true)
-		},
-		predicateValue = true
-	)
-	@Test
-	public void caccCoverTest9() {
-		assertTrue(secondPredicate(3, 40, 5));
-	}
-
-	@CACC(
-		predicate ="d + e + f",
-		majorClause = 'f',
-		valuations = {
-			@Valuation(clause = 'd', valuation = false),
-			@Valuation(clause = 'e', valuation = false),
-			@Valuation(clause = 'f', valuation = false)
-		},
-		predicateValue = false
-	)
-	@Test
-	public void caccCoverTest10() {
-		assertFalse(secondPredicate(3, 4, 5));
-	}
-
-	//	-----------------------------------------------------------------------------------
-
 	//	--------------------	CUTPNFP COVERAGE ------------------------------------------
 
-	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	a's unique true point
 	@UniqueTruePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -325,8 +61,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest() {
 		assertTrue(firstPredicate(-1, 1, 1));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(-1,1,1);
+		assertEquals(4, triangle);
 	}
 
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	a's near false point
 	@NearFalsePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -340,9 +81,14 @@ class TriTypeTest {
 	)
 	@Test
 	public void cutpnfpCoverTest0() {
-		assertFalse(firstPredicate(1, 1, 1));
+		assertFalse(firstPredicate(3,4,5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	b's unique true point
 	@UniqueTruePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -356,8 +102,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest1() {
 		assertTrue(firstPredicate(1, -1, 1));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(1,-1,1);
+		assertEquals(4, triangle);
 	}
 
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	b's near false point
 	@NearFalsePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -371,9 +122,14 @@ class TriTypeTest {
 	)
 	@Test
 	public void cutpnfpCoverTest2() {
-		assertFalse(firstPredicate(1, 1, 1));
+		assertFalse(firstPredicate(3,4,5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	c's unique true point
 	@UniqueTruePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -387,8 +143,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest3() {
 		assertTrue(firstPredicate(1, 1, -1));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(1,1,-1);
+		assertEquals(4, triangle);
 	}
 
+	// predicate = Side1 <= 0 || Side2 <= 0 || Side3 <= 0	-	c's near false point
 	@NearFalsePoint(
 		predicate = "a + b + c‌",
 		dnf = "a + b + c",
@@ -402,10 +163,14 @@ class TriTypeTest {
 	)
 	@Test
 	public void cutpnfpCoverTest4() {
-		assertFalse(firstPredicate(1, 1, 1));
+		assertFalse(firstPredicate(3,4,5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
-	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	d's unique true point
 	@UniqueTruePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f‌",
@@ -419,8 +184,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest5() {
 		assertTrue(secondPredicate(3, 4, 50));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,50);
+		assertEquals(4, triangle);
 	}
 
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	d's near false point
 	@NearFalsePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f",
@@ -435,8 +205,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest6() {
 		assertFalse(secondPredicate(3, 4, 5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	e's unique true point
 	@UniqueTruePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f‌",
@@ -450,8 +225,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest7() {
 		assertTrue(secondPredicate(30, 4, 5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(30,4,5);
+		assertEquals(4, triangle);
 	}
 
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	e's near false point
 	@NearFalsePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f",
@@ -466,8 +246,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest8() {
 		assertFalse(secondPredicate(3, 4, 5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	f's unique true point
 	@UniqueTruePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f‌",
@@ -481,8 +266,13 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest9() {
 		assertTrue(secondPredicate(3, 40, 5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,40,5);
+		assertEquals(4, triangle);
 	}
 
+	// Side1+Side2 <= Side3 || Side2+Side3 <= Side1 || Side1+Side3 <= Side2		-	f's near false point
 	@NearFalsePoint(
 		predicate = "d + e + f‌",
 		dnf = "d + e + f",
@@ -497,6 +287,10 @@ class TriTypeTest {
 	@Test
 	public void cutpnfpCoverTest10() {
 		assertFalse(secondPredicate(3, 4, 5));
+		TriType tryType = new TriType();
+		int triangle;
+		triangle = tryType.recognizeTriangleByCode(3,4,5);
+		assertEquals(1, triangle);
 	}
 
 	//	-----------------------------------------------------------------------------------
@@ -554,7 +348,8 @@ class TriTypeTest {
 
 	private static boolean questionTwo(boolean a, boolean b, boolean c, boolean d, boolean e) {
 		boolean predicate = false;
-		predicate = (a || b || c || d || e);
+		predicate = ((a && b && d) || (c && d && e));
 		return predicate;
 	}
 }
+
